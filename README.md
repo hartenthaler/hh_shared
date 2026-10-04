@@ -4,9 +4,11 @@
 for Hartenthaler webtrees modules. It is not an enabled webtrees module and it
 does not patch webtrees core.
 
-The first shared components are the webtrees-core translation wrappers and a
-translation loader compatible with webtrees 2.2 and 2.3. Additional helpers
-are added only when at least two modules need the same behaviour.
+The shared components include webtrees-core translation wrappers, a
+translation loader compatible with webtrees 2.2 and 2.3, a cache helper for
+positive external checks, and an HTTP transport compatible with webtrees 2.2
+and 2.3. Additional helpers are added only when at least two modules need the
+same behaviour.
 
 ## Installation
 
