@@ -39,6 +39,10 @@ hh_shared/
 │   └── architecture.md
 ├── resources/                # only if shared resources are introduced
 └── src/
+    ├── Caching/
+    │   └── PositiveResultCache.php
+    ├── Http/
+    │   └── HttpTransport.php
     └── Internationalization/
         ├── MoreI18N.php
         └── TranslationLoader.php
@@ -68,6 +72,27 @@ MO files and always returns an array suitable for
 The loader closes streams reliably and never passes a missing filename to
 `str_ends_with()`.
 
+### `PositiveResultCache`
+
+`PositiveResultCache::remember()` wraps the webtrees file cache for external
+checks. A non-null resolver result is retained for the requested TTL; a null
+result is removed immediately and therefore does not turn a temporary outage
+into a cached failure. If the shared package is not available during a manual
+module test, the resolver is called directly.
+
+### `HttpTransport`
+
+`HttpTransport::default()` is the common boundary for outbound HTTP requests.
+On webtrees 2.3 it uses the PSR-18 client and request factory from the webtrees
+service container. On webtrees 2.2, or when the container is not available in
+a standalone test, it falls back to the Guzzle client already supplied by the
+webtrees installation. Requests are bounded and failures return `null` rather
+than leaking client-specific exceptions into provider code.
+
+The transport deliberately does not decide whether a provider response is
+valid, how redirects are handled, or how long data may be cached. Response
+interpretation and cache policy remain in the consuming module.
+
 ## Compatibility policy
 
 - Support webtrees 2.2 and 2.3 explicitly; do not retain obsolete 2.1 names
@@ -83,6 +108,10 @@ Possible later adapters include changed access-level enums, facts signatures,
 route registration and controller class names. They should be extracted only
 after a second module needs the same adapter and both webtrees versions have
 been tested.
+
+`PositiveResultCache` is the shared exception for external reachability or
+lookup checks: it retains successful results for the requested TTL and removes
+failed results immediately, so temporary outages are not cached.
 
 CLI bootstrap code, provider clients, EXID logic and place-specific
 normalisation are optional components and should not be added to the common
